@@ -10,7 +10,7 @@
 ![python](https://img.shields.io/badge/Python-3.7–3.13-3F4C96)
 ![platform](https://img.shields.io/badge/Windows-x64%20%7C%20x86-4B4A52)
 ![license](https://img.shields.io/badge/лицензия-GPL--3.0-6D4D42)
-![builds](https://img.shields.io/badge/сборки-pyWDTT.pyw%20·%20qwdtt.py-2FCB95)
+![builds](https://img.shields.io/badge/сборки-pyWDTT.pyw%20·%20universal-2FCB95)
 ![size](https://img.shields.io/badge/13.5%20МБ%20%7C%200.75%20МБ-4B4A52)
 
 [Скачать](#две-сборки) · [Возможности](#возможности) · [CLI](#командная-строка) · [Как устроено](#как-это-устроено) · [Лицензия](#лицензия)
@@ -34,20 +34,37 @@
 приложение → 127.0.0.1:1080 → pyWDTT → DTLS в RTP-обфускации → TURN VK → ваш VPS → интернет
 ```
 
+## Скриншоты
+
+<p align="center">
+  <img src="docs/screenshots/tunnel.webp" width="49%" alt="Экран туннеля">
+  <img src="docs/screenshots/connected.webp" width="49%" alt="Подключено">
+</p>
+<p align="center">
+  <img src="docs/screenshots/profiles.webp" width="49%" alt="Профили">
+  <img src="docs/screenshots/settings.webp" width="49%" alt="Настройки">
+</p>
+<p align="center">
+  <img src="docs/screenshots/logs.webp" width="49%" alt="Логи">
+  <img src="docs/screenshots/dark.webp" width="49%" alt="Тёмная тема">
+</p>
+
+Живой интерфейс можно потрогать на [сайте проекта](https://justac0d1x.github.io/PyWDTT/) — там же демо с имитацией подключения.
+
 ## Две сборки
 
 Код один и тот же — отличается только тем, как он получает `cryptography`. Обе работают без интернета: ничего не докачивается в рантайме.
 
-|  | **`pyWDTT.pyw`** — всё внутри | **`qwdtt.py`** — лёгкая |
+|  | **`pyWDTT.pyw`** — всё внутри | **`pyWDTT-universal.py`** — лёгкая |
 |---|---|---|
 | Размер | 13.5 МБ | 0.75 МБ |
 | Системы | Windows 10/11, x64 и x86 | Windows, Linux, macOS — везде, где есть Python 3.7+ |
 | Криптография | 18 колёс внутри файла (`cryptography`, `cffi`, `pycparser` под Python 3.7–3.13) | системный пакет `cryptography`, если он установлен, иначе встроенная реализация на чистом Python |
 | Что нужно до запуска | Python + Edge WebView2 | Python; для окна — WebView2 (Windows) либо GTK/Qt (Linux); `pip install cryptography` — по желанию |
-| Запуск | двойной клик, ничего не настраивается | `python3 qwdtt.py` или `./qwdtt.py` |
+| Запуск | двойной клик, ничего не настраивается | `python3 pyWDTT-universal.py` или `./pyWDTT-universal.py` |
 | Кому | обычный пользователь Windows: скачал — работает | серверы, Linux/macOS, скрипты, аудит кода |
 
-Обе сборки собираются из одного источника: `python3 build_lite.py` берёт `pyWDTT.pyw` и вырезает из него вшитые колёса, получая `qwdtt.py`. Никаких «двух кодовых баз», расхождение исключено.
+Обе сборки собираются из одного источника: `python3 build_lite.py` берёт `pyWDTT.pyw` и вырезает из него вшитые колёса, получая `pyWDTT-universal.py`. Никаких «двух кодовых баз», расхождение исключено.
 
 ## Возможности
 
@@ -68,17 +85,17 @@
 
 ### Windows: всё внутри (`pyWDTT.pyw`)
 
-1. Скачайте `pyWDTT.pyw` из [Releases](https://github.com/SpaceNeuroX/pyWDTT/releases) или с сайта проекта.
+1. Скачайте `pyWDTT.pyw` из [Releases](https://github.com/justac0d1x/PyWDTT/releases) или с сайта проекта.
 2. Положите в любую папку, например `C:\Apps`.
 3. Двойной клик — откроется окно. Или `python pyWDTT.pyw` из консоли.
 
 Microsoft Edge WebView2 Runtime нужен для окна и уже есть в Windows 10/11. Библиотеки распаковываются во `%TEMP%\qwdtt-libs-<хеш>` при первом запуске — это локальная операция, интернет не используется.
 
-### Любая система: лёгкая сборка (`qwdtt.py`)
+### Любая система: лёгкая сборка (`pyWDTT-universal.py`)
 
 ```bash
-python3 qwdtt.py                 # окно (нужен pywebview)
-python3 qwdtt.py --help          # консольный режим, список ключей
+python3 pyWDTT-universal.py                 # окно (нужен pywebview)
+python3 pyWDTT-universal.py --help          # консольный режим, список ключей
 ```
 
 ```bash
@@ -99,8 +116,8 @@ pip install cryptography         # по желанию: в разы быстре
 python pyWDTT.pyw --vk ХЕШ --peer 1.2.3.4:56000 --password ПАРОЛЬ \
                   --mode socks --socks 127.0.0.1:1080
 
-python3 qwdtt.py --vk ХЕШ --peer 1.2.3.4:56000 --password ПАРОЛЬ --mode wg
-python3 qwdtt.py --vk ХЕШ --peer 1.2.3.4:56000 --password ПАРОЛЬ --check-hashes
+python3 pyWDTT-universal.py --vk ХЕШ --peer 1.2.3.4:56000 --password ПАРОЛЬ --mode wg
+python3 pyWDTT-universal.py --vk ХЕШ --peer 1.2.3.4:56000 --password ПАРОЛЬ --check-hashes
 ```
 
 `pyWDTT.pyw` принимает те же ключи. Основные: `--vk`, `--peer`, `--password`, `--mode wg|raw|socks`, `--turn`, `--turn-transport udp|tcp`, `--obfs audio|video`, `--mtu`, `--dns`, `--socks`, `--socks-auth`, `--up-proxy`, `--captcha-command`, `--captcha-token-file`, `--interface auto|gui|console`. Полный список — `python pyWDTT.pyw --help`.
@@ -110,11 +127,11 @@ python3 qwdtt.py --vk ХЕШ --peer 1.2.3.4:56000 --password ПАРОЛЬ --chec
 В репозитории есть автономная самопроверка — работает на любом Python 3.7+ и не требует сети:
 
 ```bash
-python selftest_offline.py                     # рядом с pyWDTT.pyw или qwdtt.py
+python selftest_offline.py                     # рядом с pyWDTT.pyw / pyWDTT-universal.py
 QWDTT_CRYPTO=pure python selftest_offline.py   # принудительно чистый Python
 ```
 
-Скрипт сам находит `pyWDTT.pyw`, `pyWDTT.py` или `qwdtt.py` в своей папке — положите его рядом с той сборкой, которую проверяете.
+Скрипт сам находит `pyWDTT.pyw` или `pyWDTT-universal.py` в своей папке — положите его рядом с той сборкой, которую проверяете.
 
 Ожидаемый итог — `Все проверки пройдены ✓`. Скрипт проверяет встроенную криптографию на официальных векторах (NIST GCM TC2/TC4, Poly1305 RFC 8439, X25519) и сквозные сценарии: обфускацию RTP, WireGuard AEAD, record layer DTLS.
 
@@ -122,10 +139,10 @@ QWDTT_CRYPTO=pure python selftest_offline.py   # принудительно чи
 
 ```bat
 certutil -hashfile pyWDTT.pyw SHA256
-certutil -hashfile qwdtt.py SHA256
+certutil -hashfile pyWDTT-universal.py SHA256
 ```
 
-Актуальный хеш указан в [Releases](https://github.com/SpaceNeuroX/pyWDTT/releases) и на странице проекта.
+Актуальный хеш указан в [Releases](https://github.com/justac0d1x/PyWDTT/releases) и на странице проекта.
 
 ## Как это устроено
 
@@ -144,7 +161,7 @@ certutil -hashfile qwdtt.py SHA256
 **Как получаются две сборки.** `build_lite.py` вырезает из `pyWDTT.pyw` блоки `_BUNDLED_WHEELS` и `_BUNDLED_SHA256` — всё остальное совпадает побайтно:
 
 ```bash
-python3 build_lite.py            # pyWDTT.pyw → qwdtt.py, печатает размер и sha256
+python3 build_lite.py            # pyWDTT.pyw → pyWDTT-universal.py (размер + sha256)
 python3 site_src/build_site.py   # собирает сайт и кладёт рядом обе сборки
 ```
 
@@ -163,24 +180,26 @@ python3 site_src/build_site.py   # собирает сайт и кладёт р�
 
 ## Сайт
 
-В каталоге `site/` лежит готовый лендинг для GitHub Pages: описание, **живой интерфейс прямо на странице** (тот же HTML, что в окне приложения, — кликается, подключается, переключает темы), установка, скачивание и проверка контрольной суммы. Подробности публикации — в [КАК-ОПУБЛИКОВАТЬ.md](КАК-ОПУБЛИКОВАТЬ.md).
+Лендинг для GitHub Pages собирается из `site_src/` одной командой (`python3 site_src/build_site.py`) и публикуется workflow-ом `.github/workflows/pages.yml`: описание, **живой интерфейс прямо на странице** (тот же HTML, что в окне приложения, — кликается, подключается, переключает темы), установка, скачивание и проверка контрольной суммы. Подробности публикации — в [КАК-ОПУБЛИКОВАТЬ.md](КАК-ОПУБЛИКОВАТЬ.md).
 
 ## Структура репозитория
 
 ```
 pyWDTT.pyw             ← сборка «всё внутри» (Windows, 13.5 МБ) — основной продукт
-qwdtt.py               ← та же программа без вшитых колёс (любая ОС, 0.75 МБ)
-build_lite.py          ← делает qwdtt.py из pyWDTT.pyw (единственный источник кода)
+pyWDTT-universal.py    ← та же программа без вшитых колёс (любая ОС, 0.75 МБ)
+build_lite.py          ← делает pyWDTT-universal.py из pyWDTT.pyw (один источник кода)
 selftest_offline.py    ← автономная самопроверка криптографии, сети не требует
 pyWDTT.ico             ← иконка приложения (16–256 px, она же вшита в оба файла)
 LICENSE                ← GNU GPL v3
-site/                  ← готовый лендинг для GitHub Pages: index.html, demo.html,
-                         обе сборки и иконка для скачивания
-site_src/              ← шаблон и ассеты; python3 site_src/build_site.py пересобирает site/
-docs/screenshots/      ← скриншоты интерфейса для README
+CHANGELOG.md           ← что менялось по версиям
+docs/screenshots/      ← картинки для README (icon.png и скриншоты интерфейса)
+site_src/              ← шаблон лендинга, ассеты и сборщик
+КАК-ОПУБЛИКОВАТЬ.md    ← публикация сайта на GitHub Pages (workflow уже готов)
+site/                    генерируется: python3 site_src/build_site.py (в git не хранится)
+.github/workflows/     ← CI: самопроверка, релиз по тегу, публикация сайта
 ```
 
-Правило простое: правим только `pyWDTT.pyw`, потом `python3 build_lite.py` и `python3 site_src/build_site.py`. Руками `qwdtt.py` не редактируется — при следующей сборке правки потеряются.
+Правило простое: правим только `pyWDTT.pyw`, потом `python3 build_lite.py` и `python3 site_src/build_site.py`. Руками `pyWDTT-universal.py` не редактируется — при следующей сборке правки потеряются.
 
 Сайт полностью автономен: шрифты, иконка и сам интерфейс приложения вшиты в `index.html`. Отдельная копия интерфейса лежит в `demo.html` — на неё ведёт ссылка «во весь экран».
 
