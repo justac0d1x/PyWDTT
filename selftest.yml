@@ -1,0 +1,63 @@
+name: Проверки
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  selftest:
+    name: Самопроверка · ${{ matrix.os }} · Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Синтаксис файлов
+        run: python -m py_compile pyWDTT.pyw pyWDTT-universal.py selftest_offline.py build_lite.py
+
+      - name: Криптография и туннель (без сети)
+        run: python selftest_offline.py
+        env:
+          QWDTT_CRYPTO: pure
+
+      - name: Консольный режим отвечает
+        run: python pyWDTT-universal.py --help
+
+      - name: Лёгкая сборка совпадает с полной
+        run: |
+          python build_lite.py
+          git diff --exit-code -- pyWDTT-universal.py
+
+  legacy:
+    name: Python ${{ matrix.python }} (совместимость)
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.7', '3.8']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Синтаксис под старым Python
+        run: python -m py_compile pyWDTT.pyw pyWDTT-universal.py selftest_offline.py
+
+      - name: Самопроверка
+        run: python selftest_offline.py
+        env:
+          QWDTT_CRYPTO: pure

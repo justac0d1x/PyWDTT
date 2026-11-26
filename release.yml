@@ -1,0 +1,44 @@
+name: Релиз
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Собрать файлы и опубликовать
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Лёгкая сборка из полной
+        run: |
+          python build_lite.py
+          git diff --exit-code -- pyWDTT-universal.py
+
+      - name: Самопроверка перед публикацией
+        run: python selftest_offline.py
+        env:
+          QWDTT_CRYPTO: pure
+
+      - name: Контрольные суммы
+        run: sha256sum pyWDTT.pyw pyWDTT-universal.py pyWDTT.ico > SHA256SUMS && cat SHA256SUMS
+
+      - name: Публикация релиза
+        uses: softprops/action-gh-release@v2
+        with:
+          name: pyWDTT ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            pyWDTT.pyw
+            pyWDTT-universal.py
+            pyWDTT.ico
+            SHA256SUMS
