@@ -1,4 +1,3 @@
-[README (2).md](https://github.com/user-attachments/files/35476823/README.2.md)
 <div align="center">
 
 <img src="docs/screenshots/icon.png" width="96" alt="Иконка pyWDTT">
