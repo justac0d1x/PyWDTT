@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  PYTHONUTF8: '1'
+  PYTHONIOENCODING: utf-8
+
 jobs:
   selftest:
     name: Самопроверка · ${{ matrix.os }} · Python ${{ matrix.python }}
@@ -37,7 +41,7 @@ jobs:
       - name: Лёгкая сборка совпадает с полной
         run: |
           python build_lite.py
-          git diff --exit-code -- pyWDTT-universal.py
+          git -c core.fileMode=false diff --exit-code -- pyWDTT-universal.py
 
   legacy:
     name: Python ${{ matrix.python }} (совместимость)
