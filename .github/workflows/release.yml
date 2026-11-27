@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+env:
+  PYTHONUTF8: '1'
+  PYTHONIOENCODING: utf-8
+
 jobs:
   release:
     name: Собрать файлы и опубликовать
@@ -22,7 +26,7 @@ jobs:
       - name: Лёгкая сборка из полной
         run: |
           python build_lite.py
-          git diff --exit-code -- pyWDTT-universal.py
+          git -c core.fileMode=false diff --exit-code -- pyWDTT-universal.py
 
       - name: Самопроверка перед публикацией
         run: python selftest_offline.py
