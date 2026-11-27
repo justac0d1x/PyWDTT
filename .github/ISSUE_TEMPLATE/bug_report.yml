@@ -1,0 +1,43 @@
+name: Что-то не работает
+description: Ошибка, падение, окно не открылось
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Перед отправкой загляните в `%TEMP%\qwdtt-window.log` (Windows) или `/tmp/qwdtt-window.log` — там почти всегда написана причина.
+  - type: dropdown
+    id: build
+    attributes:
+      label: Какая сборка
+      options:
+        - pyWDTT.pyw (всё внутри)
+        - pyWDTT-universal.py (лёгкая)
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Система и Python
+      placeholder: Windows 11 x64, Python 3.12.4
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Что делали
+      placeholder: Запустил, выбрал профиль, нажал «Подключиться» — через 5 секунд ошибка
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Хвост лога
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверено
+      options:
+        - label: Сверил SHA-256 скачанного файла с сайтом или релизом
+        - label: Ищу в существующих issue, такой проблемы нет
