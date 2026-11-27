@@ -6,7 +6,7 @@
 
 **Десктопный клиент qWDTT: туннель WireGuard поверх DTLS через TURN-инфраструктуру звонков VK. Две сборки одного кода — «всё внутри» для Windows и лёгкая для любой системы.**
 
-![version](https://img.shields.io/badge/версия-1.4.5--py-5F5674)
+![version](https://img.shields.io/badge/версия-0.9-5F5674)
 ![python](https://img.shields.io/badge/Python-3.7–3.13-3F4C96)
 ![platform](https://img.shields.io/badge/Windows-x64%20%7C%20x86-4B4A52)
 ![license](https://img.shields.io/badge/лицензия-GPL--3.0-6D4D42)
@@ -191,7 +191,6 @@ build_lite.py          ← делает pyWDTT-universal.py из pyWDTT.pyw (о�
 selftest_offline.py    ← автономная самопроверка криптографии, сети не требует
 pyWDTT.ico             ← иконка приложения (16–256 px, она же вшита в оба файла)
 LICENSE                ← GNU GPL v3
-CHANGELOG.md           ← что менялось по версиям
 docs/screenshots/      ← картинки для README (icon.png и скриншоты интерфейса)
 site_src/              ← шаблон лендинга, ассеты и сборщик
 КАК-ОПУБЛИКОВАТЬ.md    ← публикация сайта на GitHub Pages (workflow уже готов)
@@ -233,6 +232,6 @@ pyWDTT — самостоятельное развитие [qWDTT для Android
 
 <div align="center">
 
-[Группа qWDTT в Telegram](https://t.me/darkbit_chat) · [qWDTT для Android](https://github.com/SpaceNeuroX/proxy-turn-vk-android) · [Поддержать разработку](https://pay.cloudtips.ru/p/64a6c43c)
+[Группа qWDTT в Telegram](https://t.me/darkbit_chat) · [qWDTT для Android](https://github.com/SpaceNeuroX/proxy-turn-vk-android)
 
 </div>
