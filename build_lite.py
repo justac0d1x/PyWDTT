@@ -37,10 +37,6 @@ def build():
     if "_BUNDLED_WHEELS = {}" not in out:
         raise SystemExit("не удалось очистить встроенные колёса")
     open(OUT, "w", encoding="utf-8").write(out)
-    try:
-        os.chmod(OUT, 0o755)
-    except OSError:
-        pass
     return src, out
 
 
