@@ -182,6 +182,7 @@ a{color:inherit;text-decoration:none}
 .btn:active{transform:translateY(1px)}
 .btn.solid{background:var(--strong);color:var(--on-strong);border-color:transparent;box-shadow:0 10px 22px rgba(var(--tint),.16)}
 .btn.solid:hover{background:var(--strong-hover)}
+.btn.done{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--line))}
 .btn.sm{padding:8px 12px;font-size:12.5px;border-radius:11px}
 .btn svg{flex:0 0 auto}
 
@@ -481,7 +482,7 @@ pythonw pyWDTT.pyw    :: без консольного окна</pre>
         <span class="size">$SIZE · Python 3.7–3.13 · Windows x64/x86</span>
         <div class="file-actions" style="display:flex;gap:7px">
           <a class="btn sm solid" href="pyWDTT.pyw" download>Скачать</a>
-          <button class="btn sm" data-copy="$SHA256">sha256</button>
+          <button class="btn sm" data-copy="$SHA256" title="Скопировать SHA-256">sha256</button>
         </div>
         <div class="hash">SHA-256: $SHA256</div>
       </div>
@@ -492,8 +493,8 @@ pythonw pyWDTT.pyw    :: без консольного окна</pre>
         </span>
         <span class="size">$LITE_SIZE · без встроенных библиотек · Windows, Linux, macOS</span>
         <div class="file-actions" style="display:flex;gap:7px">
-          <a class="btn sm" href="pyWDTT-universal.py" download>Скачать</a>
-          <button class="btn sm" data-copy="$LITE_SHA256">sha256</button>
+          <a class="btn sm solid" href="pyWDTT-universal.py" download>Скачать</a>
+          <button class="btn sm" data-copy="$LITE_SHA256" title="Скопировать SHA-256">sha256</button>
         </div>
         <div class="hash">SHA-256: $LITE_SHA256</div>
       </div>
@@ -634,7 +635,7 @@ const savedTheme = readPref('qwdtt-theme');
 if (savedTheme) applyTheme(savedTheme);
 else if (matchMedia('(prefers-color-scheme:dark)').matches) applyTheme('dark');
 
-document.querySelectorAll('.copy').forEach(btn => {
+document.querySelectorAll('[data-copy]').forEach(btn => {
   btn.addEventListener('click', async () => {
     const text = btn.dataset.copy || '';
     try { await navigator.clipboard.writeText(text); }
@@ -661,7 +662,8 @@ document.querySelectorAll('[data-tab]').forEach(btn => {
   });
 });
 
-const EXPECTED = "$SHA256";
+const EXPECTED_FULL = "$SHA256";
+const EXPECTED_LITE = "$LITE_SHA256";
 const hashInput = document.getElementById('hash-input');
 const hashResult = document.getElementById('hash-result');
 document.getElementById('hash-check').addEventListener('click', () => {
@@ -669,9 +671,11 @@ document.getElementById('hash-check').addEventListener('click', () => {
   if (!value) {
     hashResult.className = 'checker-result';
     hashResult.textContent = 'Вставьте хеш из certutil или Get-FileHash.';
-  } else if (value === EXPECTED) {
+  } else if (value === EXPECTED_FULL || value === EXPECTED_LITE) {
     hashResult.className = 'checker-result ok';
-    hashResult.textContent = 'Совпадает — файл целый и это тот самый релиз.';
+    hashResult.textContent = value === EXPECTED_FULL
+      ? 'Совпадает — это pyWDTT.pyw, файл целый и не подменён.'
+      : 'Совпадает — это pyWDTT-universal.py, файл целый и не подменён.';
   } else {
     hashResult.className = 'checker-result bad';
     hashResult.textContent = value.length < 64
