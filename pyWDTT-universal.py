@@ -75,6 +75,13 @@ if sys.stdout is None:   # pythonw.exe: консоли нет, весь выво
     sys.stdout = _GUI_LOG
 if sys.stderr is None:
     sys.stderr = _GUI_LOG
+for _stream in (sys.stdout, sys.stderr):
+    try:                       # вывод в файл или в pipe: пишем UTF-8, а не cp1251
+        if _stream is not None and _stream is not _GUI_LOG \
+                and hasattr(_stream, "reconfigure") and not _stream.isatty():
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 def _installer_python():
     if os.name == "nt" and os.path.basename(sys.executable).lower() == "pythonw.exe":
@@ -5341,7 +5348,7 @@ class CredsProvider:
 def _vk_delay(min_ms: int, max_ms: int):
     time.sleep(random.uniform(min_ms, max_ms) / 1000.0)
 
-VERSION = "1.4.5-py"
+VERSION = "0.9"
 BANNER = r"""
    ___  _      __ _____  _____  _____
   / _ \| |    / /|  _  \|_   _||_   _|
@@ -5862,7 +5869,7 @@ class _Args:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        prog="qwdtt.py",
+        prog=os.path.basename(sys.argv[0]) or "pyWDTT",
         description="Клиент qWDTT для ПК: TURN через VK → DTLS/прямой режим → "
                     "WireGuard (или RAW) → локальный SOCKS5. Без UI.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -5955,7 +5962,7 @@ def build_parser() -> argparse.ArgumentParser:
                    help="период вывода статистики, с (0 = выключить)")
     g.add_argument("-direct-server", default="", metavar="HOST:PORT",
                    help=argparse.SUPPRESS)
-    p.add_argument("-version", action="version", version="qwdtt.py " + VERSION)
+    p.add_argument("-version", action="version", version="pyWDTT " + VERSION)
     return p
 
 def default_device_id() -> str:
@@ -7872,7 +7879,7 @@ html[data-theme="dark"] .sheet-textarea{background:var(--sheet-sunken)}
       </div>
     </div>
     <div class="about">
-      <div class="about-title">pyWDTT <span class="ver" id="about-version">0.9.0</span></div>
+      <div class="about-title">pyWDTT <span class="ver" id="about-version">0.9</span></div>
       <div class="about-line">автор <span class="who">_C0D1X_</span></div>
       <button class="btn-outline sm about-tg" id="btn-tg" type="button" aria-label="Канал в Telegram">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 4.3 18.5 19c-.2 1-.9 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.5.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L6.9 12.9l-4.4-1.4c-1-.3-1-1 .2-1.4l17.3-6.7c.8-.3 1.5.2 1.6 1.1Z"/></svg>
