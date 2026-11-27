@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ru" data-theme="light" data-palette="violet">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>pyWDTT — туннель через VK TURN в одном файле</title>
+<meta name="description" content="pyWDTT — десктопный клиент qWDTT для Windows: туннель WireGuard over DTLS через TURN-инфраструктуру VK. Один .pyw со встроенными библиотеками, Python 3.7–3.13.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" href="$FAVICON">
+<meta property="og:title" content="pyWDTT — туннель через VK TURN в одном файле">
+<meta property="og:description" content="Один .pyw со встроенной криптографией для Windows x64/x86 и Python 3.7–3.13.">
+<meta property="og:image" content="$FAVICON">
+<meta property="og:type" content="website">
+<style>
+$FONTS
+
+:root{
+  --font:'Manrope','Segoe UI Variable Display','Segoe UI',system-ui,-apple-system,'Roboto',sans-serif;
+  --mono:'JetBrains Mono',Consolas,'Cascadia Mono',ui-monospace,monospace;
+  --r-card:24px;
+  --r-ctl:14px;
+}
+
+/* ── палитры: те же четыре, что в приложении ─────────────── */
+html[data-palette="violet"]{
+  --bg:#FAF5FC; --decor:#EDE7F1; --card:#F2EDF4; --surface:#F7F3F9; --sunken:#EFE9F2;
+  --line:#E4DEE9; --stroke:#CAC4D2;
+  --ink:#1E1A23; --ink-2:#3A3542; --ink-3:#55525B; --muted:#7C7683; --label:#6B6572;
+  --strong:#55525B; --strong-hover:#625F6B; --on-strong:#fff;
+  --chip:#EAE5EE; --chip-on:#E4E0F1;
+  --accent:#5F5674; --grad-end:#7A63D8;
+  --topbar:rgba(250,245,252,.82); --topbar-line:rgba(212,203,222,.6);
+  --code-bg:#F1ECF4; --frame:#242029;
+  --tint:70,50,90;
+  --ok:#4FB05A; --danger:#B3352F; --warn:#B8801F;
+}
+html[data-theme="dark"][data-palette="violet"]{
+  --bg:#161419; --decor:#1B191E; --card:#211F24; --surface:#26242B; --sunken:#1C1A20;
+  --line:#2C2A31; --stroke:#3A3740;
+  --ink:#EDEAF1; --ink-2:#D8D4DD; --ink-3:#BDB8C5; --muted:#958F9D; --label:#A8A2B0;
+  --strong:#E9E5EF; --strong-hover:#F5F2F8; --on-strong:#181619;
+  --chip:#26242B; --chip-on:#302F37;
+  --accent:#B8A9D6; --grad-end:#BBA8F0;
+  --topbar:rgba(22,20,25,.84); --topbar-line:rgba(58,55,64,.7);
+  --code-bg:#1C1A20; --frame:#0E0D10;
+  --tint:0,0,0;
+  --ok:#6FD07B; --danger:#F2B8B6; --warn:#E2B24C;
+}
+html[data-palette="indigo"]{
+  --bg:#F2F4FC; --decor:#DEE3F6; --card:#E9EDF8; --surface:#F2F5FD; --sunken:#E6EBF8;
+  --line:#DEE3F1; --stroke:#C3CADD;
+  --ink:#191C2B; --ink-2:#333850; --ink-3:#4C5266; --muted:#767C93; --label:#666D84;
+  --strong:#3F4C96; --strong-hover:#36418A; --on-strong:#fff;
+  --chip:#E3E8F6; --chip-on:#D8E0F7;
+  --accent:#3F4C96; --grad-end:#4A57B8;
+  --topbar:rgba(242,244,252,.84); --topbar-line:rgba(203,212,232,.6);
+  --code-bg:#EDF1FA; --frame:#171A28;
+  --tint:40,50,90;
+  --ok:#3E9A4C; --danger:#B3352F; --warn:#B8801F;
+}
+html[data-theme="dark"][data-palette="indigo"]{
+  --bg:#131520; --decor:#181A26; --card:#1D2030; --surface:#191C29; --sunken:#222534;
+  --line:#262A3B; --stroke:#343A50;
+  --ink:#EAEDF7; --ink-2:#CBD2E6; --ink-3:#AEB6CC; --muted:#8C93A9; --label:#9AA2B8;
+  --strong:#E3E8F8; --strong-hover:#F0F3FC; --on-strong:#131520;
+  --chip:#222534; --chip-on:#2E3346;
+  --accent:#8E9BE0; --grad-end:#93A0E8;
+  --topbar:rgba(19,21,32,.86); --topbar-line:rgba(255,255,255,.07);
+  --code-bg:#191C29; --frame:#0B0D14;
+  --tint:0,0,0;
+  --ok:#6FD07B; --danger:#F2B8B6; --warn:#E2B24C;
+}
+html[data-palette="graphite"]{
+  --bg:#F6F5F7; --decor:#E5E4E8; --card:#ECEBEE; --surface:#F5F4F6; --sunken:#E9E8EC;
+  --line:#E1E0E4; --stroke:#C5C4C9;
+  --ink:#1B1B1E; --ink-2:#343438; --ink-3:#4F4F55; --muted:#78787E; --label:#69696F;
+  --strong:#4B4A52; --strong-hover:#404047; --on-strong:#fff;
+  --chip:#E6E5E9; --chip-on:#DCDBE1;
+  --accent:#4B4A52; --grad-end:#5A5962;
+  --topbar:rgba(246,245,247,.84); --topbar-line:rgba(212,211,217,.55);
+  --code-bg:#F0EFF2; --frame:#1E1D21;
+  --tint:40,40,46;
+  --ok:#3E9A4C; --danger:#B3352F; --warn:#B8801F;
+}
+html[data-theme="dark"][data-palette="graphite"]{
+  --bg:#17171A; --decor:#1C1C20; --card:#212125; --surface:#1D1D21; --sunken:#252529;
+  --line:#2B2B30; --stroke:#3A3A40;
+  --ink:#EFEFF1; --ink-2:#D5D5D8; --ink-3:#B7B7BB; --muted:#93939A; --label:#A0A0A6;
+  --strong:#E8E8EA; --strong-hover:#F4F4F6; --on-strong:#17171A;
+  --chip:#252529; --chip-on:#333338;
+  --accent:#A5A4AE; --grad-end:#ABAAB4;
+  --topbar:rgba(23,23,26,.86); --topbar-line:rgba(255,255,255,.07);
+  --code-bg:#1D1D21; --frame:#101012;
+  --tint:0,0,0;
+  --ok:#6FD07B; --danger:#F2B8B6; --warn:#E2B24C;
+}
+html[data-palette="caramel"]{
+  --bg:#FBF6F1; --decor:#EFE5DC; --card:#F4EDE6; --surface:#FBF5EE; --sunken:#F1E8DD;
+  --line:#E9DFD5; --stroke:#D2C3B5;
+  --ink:#241C16; --ink-2:#3E3229; --ink-3:#5B4C40; --muted:#877568; --label:#776558;
+  --strong:#6D4D42; --strong-hover:#5C3F35; --on-strong:#fff;
+  --chip:#EFE7DF; --chip-on:#E9DED2;
+  --accent:#8A5F4C; --grad-end:#A0623F;
+  --topbar:rgba(251,246,241,.85); --topbar-line:rgba(219,207,193,.55);
+  --code-bg:#F7F1E9; --frame:#2A211B;
+  --tint:80,55,35;
+  --ok:#3E9A4C; --danger:#B3352F; --warn:#B8801F;
+}
+html[data-theme="dark"][data-palette="caramel"]{
+  --bg:#191411; --decor:#1E1915; --card:#241E19; --surface:#201A15; --sunken:#292219;
+  --line:#322820; --stroke:#443728;
+  --ink:#F1E9E2; --ink-2:#DDD0C5; --ink-3:#C2B3A6; --muted:#9C8D80; --label:#AC9C8E;
+  --strong:#EDE3DA; --strong-hover:#F8F1EB; --on-strong:#191411;
+  --chip:#292219; --chip-on:#372D23;
+  --accent:#C39A85; --grad-end:#C99A78;
+  --topbar:rgba(25,20,17,.86); --topbar-line:rgba(255,255,255,.07);
+  --code-bg:#201A15; --frame:#120E0B;
+  --tint:0,0,0;
+  --ok:#6FD07B; --danger:#F2B8B6; --warn:#E2B24C;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;font-family:var(--font);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;line-height:1.55;
+  box-shadow:none;
+  --shadow:0 10px 22px rgba(var(--tint),.07),0 2px 6px rgba(var(--tint),.05);
+  --shadow-lg:0 22px 50px rgba(var(--tint),.13),0 6px 14px rgba(var(--tint),.06);
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(680px 420px at 10% -8%, var(--decor), transparent 70%),
+    radial-gradient(700px 420px at 94% 0%, var(--decor), transparent 72%);
+  opacity:.85;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.mono{font-family:var(--mono);font-variant-ligatures:none}
+
+/* ── верхняя панель ─────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:50;background:var(--topbar);
+  backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);
+  border-bottom:1px solid var(--topbar-line);
+}
+.topbar .wrap{display:flex;align-items:center;gap:14px;height:62px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.brand img{width:32px;height:32px;border-radius:9px;box-shadow:0 4px 12px rgba(20,16,30,.22),0 0 0 1px rgba(255,255,255,.1)}
+.nav{display:flex;gap:2px;margin-left:auto}
+.nav a{padding:8px 12px;border-radius:11px;font-size:13.5px;font-weight:650;color:var(--ink-3);transition:background .16s,color .16s}
+.nav a:hover{background:var(--chip);color:var(--ink)}
+.nav a.on{background:var(--chip-on);color:var(--ink)}
+.actions{display:flex;align-items:center;gap:8px;margin-left:8px}
+.palettes{display:flex;gap:7px;align-items:center;padding-right:6px}
+.swatch{
+  width:20px;height:20px;border-radius:50%;border:0;padding:0;cursor:pointer;
+  outline:2px solid transparent;outline-offset:2px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.14);
+  transition:transform .14s,outline-color .14s;
+}
+.swatch:hover{transform:scale(1.12)}
+.swatch.on{outline-color:var(--ink)}
+.icon-btn{
+  width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink-3);display:grid;place-items:center;cursor:pointer;transition:background .16s,color .16s,transform .12s;
+}
+.icon-btn:hover{background:var(--chip);color:var(--ink)}
+.icon-btn:active{transform:scale(.96)}
+@media (max-width:860px){.nav{display:none}.palettes{padding-right:0}}
+
+/* ── кнопки ─────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:var(--r-ctl);padding:12px 16px;font:inherit;font-size:14px;font-weight:750;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;
+  transition:background .16s,transform .12s,box-shadow .16s,border-color .16s;white-space:nowrap;
+}
+.btn:hover{background:var(--chip);border-color:var(--stroke)}
+.btn:active{transform:translateY(1px)}
+.btn.solid{background:var(--strong);color:var(--on-strong);border-color:transparent;box-shadow:0 10px 22px rgba(var(--tint),.16)}
+.btn.solid:hover{background:var(--strong-hover)}
+.btn.sm{padding:8px 12px;font-size:12.5px;border-radius:11px}
+.btn svg{flex:0 0 auto}
+
+/* ── hero ───────────────────────────────────────────────── */
+.hero{padding:52px 0 6px}
+.hero .wrap{display:block}
+.hero-copy{max-width:760px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--label);
+  background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 22%,transparent)}
+h1{font-size:clamp(32px,4.4vw,54px);line-height:1.04;letter-spacing:-.026em;margin:16px 0 12px;font-weight:800}
+h1 .grad{
+  background:linear-gradient(96deg,#12C5E8,#2FCB95 58%,var(--grad-end));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+html[data-theme="dark"] h1 .grad{background:linear-gradient(96deg,#6FE9F7,#69E3B4 58%,var(--grad-end));-webkit-background-clip:text;background-clip:text}
+.lead{font-size:16.5px;color:var(--ink-3);margin:0 0 22px;max-width:48ch}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.facts{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+.facts span{white-space:nowrap}
+
+/* ── живое окно приложения ──────────────────────────────── */
+.stage{margin-top:32px}
+.window{
+  width:100%;background:var(--frame);border-radius:18px;padding:10px;
+  box-shadow:var(--shadow-lg),inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.window .bar{display:flex;align-items:center;gap:7px;padding:2px 4px 10px}
+.window .bar i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.18);display:block}
+.window .bar i:nth-child(1){background:#F0655A}
+.window .bar i:nth-child(2){background:#F0BE4F}
+.window .bar i:nth-child(3){background:#5FC26B}
+.window .bar span{margin-left:9px;font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.5)}
+.screen-wrap{
+  position:relative;width:100%;aspect-ratio:1200 / 780;overflow:hidden;
+  border-radius:10px;background:var(--card);
+}
+.screen-wrap iframe{display:block;width:100%;height:100%;border:0;transform-origin:top left;background:#fff}
+@media (max-width:859px){
+  .screen-wrap{aspect-ratio:1200 / 690}
+  .screen-wrap iframe{pointer-events:none}
+}
+.stage-note{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 10px;
+  margin-top:13px;font-size:12.8px;color:var(--muted);text-align:center;
+}
+.stage-note .live{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:0 0 auto;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 22%,transparent);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.stage-note .live{animation:none}}
+.stage-note a{color:var(--strong);font-weight:650;text-decoration:none;border-bottom:1px solid var(--line)}
+.stage-note a:hover{border-color:var(--ink-3)}
+
+/* ── секции ─────────────────────────────────────────────── */
+section{padding:40px 0;position:relative;z-index:1}
+.sec-head{margin-bottom:18px;max-width:64ch}
+.sec-tag{font-size:12px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h2{font-size:clamp(22px,2.5vw,30px);line-height:1.18;letter-spacing:-.02em;margin:6px 0 8px;font-weight:800}
+.sec-head p{margin:0;color:var(--ink-3);font-size:15px}
+
+.grid{display:grid;gap:12px}
+.grid>*{min-width:0}
+.g4{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.card{
+  background:var(--card);border-radius:var(--r-card);padding:20px;box-shadow:var(--shadow);
+  border:1px solid transparent;transition:transform .18s,box-shadow .18s,border-color .18s;
+}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--line)}
+.card h3{margin:0 0 5px;font-size:15px;font-weight:800;letter-spacing:-.01em}
+.card p{margin:0;color:var(--ink-3);font-size:13.8px}
+.card .ico{
+  width:38px;height:38px;border-radius:12px;display:grid;place-items:center;margin-bottom:11px;
+  background:var(--surface);color:var(--accent);border:1px solid var(--line);
+}
+
+/* код и вкладки */
+.code{position:relative;background:var(--code-bg);border:1px solid var(--line);border-radius:16px;padding:15px}
+.code pre{margin:0;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink-2)}
+.copy{
+  font:inherit;font-size:11.5px;font-weight:750;color:var(--ink-3);background:var(--surface);
+  border:1px solid var(--line);border-radius:9px;padding:5px 9px;cursor:pointer;transition:background .15s,color .15s;
+}
+.code .copy{position:absolute;top:9px;right:9px}
+.copy:hover{background:var(--chip);color:var(--ink)}
+.copy.done{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--line))}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}
+.tabs button{
+  font:inherit;font-size:12.5px;font-weight:750;color:var(--ink-3);background:var(--card);
+  border:1px solid var(--line);border-radius:11px;padding:8px 13px;cursor:pointer;transition:background .16s,color .16s;
+}
+.tabs button.on{background:var(--chip-on);color:var(--ink);border-color:var(--stroke)}
+.panel[hidden]{display:none}
+.install-grid{grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);align-items:start}
+@media (max-width:820px){.install-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* файлы */
+.files{background:var(--card);border-radius:var(--r-card);box-shadow:var(--shadow);overflow:hidden}
+.file-row{display:flex;align-items:center;gap:14px;padding:15px 18px;flex-wrap:wrap}
+.file-row+.file-row{border-top:1px solid var(--line)}
+.file-row .name{font-family:var(--mono);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.file-row .name svg{color:var(--muted)}
+.file-note{margin-top:12px;font-size:13px;color:var(--ink-3);max-width:78ch}
+.file-note code{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:1px 5px}
+.file-row .size{font-size:12.5px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.hash{font-family:var(--mono);font-size:11.5px;color:var(--muted);word-break:break-all;width:100%}
+
+/* проверка хеша */
+.checker{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.input{
+  flex:1 1 300px;min-width:0;font-family:var(--mono);font-size:12.5px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--ink);outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.input:focus{border-color:var(--stroke);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+.checker-result{font-size:13px;font-weight:700;min-height:19px;margin-top:9px}
+.checker-result.ok{color:var(--ok)}
+.checker-result.bad{color:var(--danger)}
+
+/* faq */
+details{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:0 17px;margin-bottom:9px}
+details[open]{padding-bottom:5px}
+summary{cursor:pointer;list-style:none;padding:15px 0;font-weight:750;font-size:14px;display:flex;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{
+  content:"";margin-left:auto;width:8px;height:8px;flex:0 0 auto;border-right:2px solid var(--muted);
+  border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .18s;
+}
+details[open] summary::after{transform:rotate(-135deg)}
+details p{margin:0 0 13px;color:var(--ink-3);font-size:13.8px}
+
+/* демо-полоса */
+footer{border-top:1px solid var(--line);margin-top:16px;padding:22px 0 34px;position:relative;z-index:1}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted)}
+footer a{color:var(--ink-3);font-weight:650}
+footer a:hover{color:var(--ink)}
+.f-links{display:flex;gap:14px;flex-wrap:wrap}
+
+html.js .reveal{opacity:0;transform:translateY(12px)}
+html.js .reveal.in{opacity:1;transform:none;transition:opacity .45s,transform .45s cubic-bezier(.22,.61,.36,1)}
+@media (prefers-reduced-motion:reduce){html.js .reveal,html.js .reveal.in{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="$ICON64" alt="">pyWDTT</a>
+    <nav class="nav">
+      <a href="#what">Что это</a>
+      <a href="#install">Установка</a>
+      <a href="#files">Файлы</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <div class="actions">
+      <div class="palettes" role="group" aria-label="Цветовая палитра">
+        <button class="swatch on" data-palette="violet" style="background:#5F5674" title="Лаванда" aria-label="Палитра Лаванда"></button>
+        <button class="swatch" data-palette="indigo" style="background:#3F4C96" title="Индиго" aria-label="Палитра Индиго"></button>
+        <button class="swatch" data-palette="graphite" style="background:#4B4A52" title="Графит" aria-label="Палитра Графит"></button>
+        <button class="swatch" data-palette="caramel" style="background:#6D4D42" title="Карамель" aria-label="Палитра Карамель"></button>
+      </div>
+      <button class="icon-btn" id="theme-btn" title="Светлая / тёмная тема" aria-label="Светлая или тёмная тема">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <a class="icon-btn" id="repo-btn" href="#" title="Репозиторий на GitHub" aria-label="Репозиторий на GitHub">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.8a10.2 10.2 0 0 0-3.2 19.9c.5.1.7-.2.7-.5v-1.9c-2.8.6-3.4-1.2-3.4-1.2-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10.2 10.2 0 0 0 12 1.8Z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="dot"></span>Windows x64 / x86 · Python 3.7–3.13</span>
+      <h1>Туннель через&nbsp;VK&nbsp;TURN&nbsp;—<br><span class="grad">в одном файле</span></h1>
+      <p class="lead">Десктопный клиент qWDTT для Windows. Библиотеки внутри, качать ничего не нужно.</p>
+      <div class="hero-cta">
+        <a class="btn solid" href="pyWDTT.pyw" download>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6v11.2"/><path d="m7.8 10.6 4.2 4.2 4.2-4.2"/><path d="M4.6 19.4h14.8"/></svg>
+          Скачать pyWDTT.pyw
+        </a>
+        <div class="facts"><span>$SIZE</span><span>·</span><span>v$VERSION</span><span>·</span><span>GPL-3.0</span></div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="window">
+        <div class="bar"><i></i><i></i><i></i><span>pyWDTT — десктопное приложение</span></div>
+        <div class="screen-wrap">
+          <iframe id="demo-frame" title="Живой интерфейс pyWDTT" scrolling="no"></iframe>
+        </div>
+      </div>
+      <div class="stage-note">
+        <span class="live"></span>
+        <span>Живой интерфейс: профили, логи, настройки и темы работают — нажимайте</span>
+        <a href="demo.html" target="_blank" rel="noopener">во весь экран ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Что это</div>
+      <h2>Тот же qWDTT, но на Windows</h2>
+      <p>Android-версия поднимает системный VPN и уводит трафик через TURN-серверы VK: для сети это похоже на медиатрафик звонка. pyWDTT переносит схему на компьютер и вместо системного VPN отдаёт локальный прокси.</p>
+    </div>
+    <div class="grid g4">
+      <div class="card reveal">
+        <div class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 3.6H7.2a2 2 0 0 0-2 2v12.8a2 2 0 0 0 2 2h9.6a2 2 0 0 0 2-2V9Z"/><path d="M13.4 3.6V9h5.4"/></svg></div>
+        <h3>Один файл</h3>
+        <p>Копируется на флешку и запускается двойным кликом.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 19.6 6v6c0 4.3-3.1 7.4-7.6 8.8C7.5 19.4 4.4 16.3 4.4 12V6Z"/><path d="m9.2 12.2 2 2 3.6-3.9"/></svg></div>
+        <h3>Офлайн</h3>
+        <p>18 колёс для Python 3.7–3.13 внутри, pip не нужен.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="5.2" width="17.2" height="13.6" rx="2.6"/><path d="M7.6 9.6h5"/><path d="M7.6 13.2h8.8"/></svg></div>
+        <h3>Прокси</h3>
+        <p>HTTP и SOCKS5 на <span class="mono">127.0.0.1:1080</span>, авторизация по желанию.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l2.6-6 3 12 2.4-6h4"/></svg></div>
+        <h3>Криптография</h3>
+        <p>Нативная через <span class="mono">cryptography</span>, иначе встроенная на чистом Python.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Установка</div>
+      <h2>Скачали — запустили</h2>
+      <p>Нужен только Python и системный компонент Edge WebView2 — он есть в Windows 10 и 11.</p>
+    </div>
+    <div class="grid install-grid">
+      <div class="reveal">
+        <div class="tabs" role="tablist">
+          <button class="on" data-tab="t1">Двойной клик</button>
+          <button data-tab="t2">Из консоли</button>
+          <button data-tab="t3">Проверка файла</button>
+        </div>
+        <div class="panel" id="t1">
+          <div class="code">
+            <button class="copy" data-copy="pyWDTT.pyw">Копировать</button>
+            <pre>1. Скачайте pyWDTT.pyw
+2. Положите в любую папку, например C:\Apps
+3. Двойной клик — откроется окно pyWDTT</pre>
+          </div>
+        </div>
+        <div class="panel" id="t2" hidden>
+          <div class="code">
+            <button class="copy" data-copy="pythonw pyWDTT.pyw">Копировать</button>
+            <pre>cd C:\Apps
+python pyWDTT.pyw     :: с консолью и логом
+pythonw pyWDTT.pyw    :: без консольного окна</pre>
+          </div>
+        </div>
+        <div class="panel" id="t3" hidden>
+          <div class="code">
+            <button class="copy" data-copy="certutil -hashfile pyWDTT.pyw SHA256">Копировать</button>
+            <pre>certutil -hashfile pyWDTT.pyw SHA256
+:: или: Get-FileHash pyWDTT.pyw -Algorithm SHA256</pre>
+          </div>
+        </div>
+      </div>
+      <div class="card reveal">
+        <h3>Что нужно</h3>
+        <p style="margin-top:6px">Windows 10 или 11, x64 либо x86, Python 3.7–3.13, WebView2 Runtime. Остальное файл делает сам.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="files">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Файлы</div>
+      <h2>Скачать</h2>
+      <p>Две сборки одного и того же кода и контрольные суммы.</p>
+    </div>
+    <div class="files reveal">
+      <div class="file-row">
+        <span class="name">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 3.6H7.2a2 2 0 0 0-2 2v12.8a2 2 0 0 0 2 2h9.6a2 2 0 0 0 2-2V9Z"/><path d="M13.4 3.6V9h5.4"/></svg>
+          pyWDTT.pyw
+        </span>
+        <span class="size">$SIZE · Python 3.7–3.13 · Windows x64/x86</span>
+        <div class="file-actions" style="display:flex;gap:7px">
+          <a class="btn sm solid" href="pyWDTT.pyw" download>Скачать</a>
+          <button class="btn sm" data-copy="$SHA256">sha256</button>
+        </div>
+        <div class="hash">SHA-256: $SHA256</div>
+      </div>
+      <div class="file-row">
+        <span class="name">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 3.6H7.2a2 2 0 0 0-2 2v12.8a2 2 0 0 0 2 2h9.6a2 2 0 0 0 2-2V9Z"/><path d="M13.4 3.6V9h5.4"/></svg>
+          pyWDTT-universal.py
+        </span>
+        <span class="size">$LITE_SIZE · без встроенных библиотек · Windows, Linux, macOS</span>
+        <div class="file-actions" style="display:flex;gap:7px">
+          <a class="btn sm" href="pyWDTT-universal.py" download>Скачать</a>
+          <button class="btn sm" data-copy="$LITE_SHA256">sha256</button>
+        </div>
+        <div class="hash">SHA-256: $LITE_SHA256</div>
+      </div>
+      <div class="file-row">
+        <span class="name">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.6" y="3.6" width="16.8" height="16.8" rx="3"/><circle cx="9" cy="9.4" r="1.6"/><path d="m5.4 18 5-5.4 3.2 3.4 2.4-2.2 4 4.2"/></svg>
+          pyWDTT.ico
+        </span>
+        <span class="size">51 КБ · иконка приложения</span>
+        <div class="file-actions">
+          <a class="btn sm" href="pyWDTT.ico" download>Скачать</a>
+        </div>
+      </div>
+    </div>
+    <p class="file-note reveal">pyWDTT.pyw — всё внутри, но только Windows. pyWDTT-universal.py — тот же клиент без встроенных библиотек: берёт системный <code>cryptography</code> или считает на чистом Python, поэтому идёт и на Linux с macOS.</p>
+    <div class="checker reveal">
+      <input class="input" id="hash-input" placeholder="Вставьте SHA-256 скачанного файла" autocomplete="off" spellcheck="false" aria-label="SHA-256 файла">
+      <button class="btn" id="hash-check">Проверить</button>
+      <div class="checker-result" id="hash-result" role="status" aria-live="polite" style="flex-basis:100%"></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Вопросы</div>
+      <h2>Коротко о главном</h2>
+    </div>
+    <div class="reveal">
+      <details><summary>Окно не открылось — где смотреть причину?</summary><p>В <span class="mono">%TEMP%\qwdtt-window.log</span>: <span class="mono">Win+R</span> → <span class="mono">%TEMP%</span> → файл <span class="mono">qwdtt-window.log</span>. Запуск через <span class="mono">python pyWDTT.pyw</span> покажет ошибку и в консоли.</p></details>
+      <details><summary>Нужен ли интернет, кроме туннеля?</summary><p>Нет. Все библиотеки внутри файла, интерфейс локальный. Сеть нужна только самому туннелю.</p></details>
+      <details><summary>Антивирус ругается</summary><p>Неизвестный файл, который шифрует трафик и пишет в <span class="mono">%TEMP%</span>, выглядит подозрительно для эвристики. Сверьте SHA-256 выше и добавьте в исключения, если доверяете источнику.</p></details>
+      <details><summary>Лицензия и происхождение</summary><p>GNU GPL v3. Самостоятельное развитие <a href="https://github.com/SpaceNeuroX/proxy-turn-vk-android">qWDTT для Android</a>; интерфейс и иконка оттуда же.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>© <span id="year">2026</span> pyWDTT · GPL-3.0 · v$VERSION</div>
+    <div class="f-links">
+      <a href="https://github.com/SpaceNeuroX/proxy-turn-vk-android">qWDTT для Android</a>
+      <a href="https://t.me/darkbit_chat">Telegram</a>
+      <a href="#top">Наверх</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+window.DEMO_HTML = $DEMO_HTML;
+document.documentElement.classList.add('js');
+
+/* ── живой интерфейс: тот же HTML, что в окне приложения ── */
+const frame = document.getElementById('demo-frame');
+const screenWrap = frame ? frame.parentElement : null;
+if (frame && typeof DEMO_HTML === 'string' && DEMO_HTML) frame.srcdoc = DEMO_HTML;
+
+function fitFrame(){
+  if (!frame || !screenWrap) return;
+  const w = screenWrap.clientWidth;
+  if (window.innerWidth >= 860 || !w) {
+    frame.style.width = '100%';
+    frame.style.height = '100%';
+    frame.style.transform = '';
+    return;
+  }
+  /* на телефоне крутим интерфейс как есть, уменьшая масштаб целиком */
+  const logical = 1000;
+  frame.style.width = logical + 'px';
+  frame.style.height = Math.round(logical * .72) + 'px';
+  frame.style.transform = 'scale(' + (w / logical).toFixed(4) + ')';
+}
+fitFrame();
+window.addEventListener('resize', fitFrame);
+
+/* тема и палитра сайта применяются и внутри окна приложения */
+function pushLook(){
+  const wanted = {
+    palette: document.documentElement.dataset.palette || 'violet',
+    theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+  };
+  let win = null;
+  try { win = frame && frame.contentWindow; } catch (e) { return; }
+  if (!win || !win.DEMO || typeof win.DEMO.get_state !== 'function') return;
+  try {
+    Promise.resolve(win.DEMO.get_state()).then(res => {
+      const model = res && res.data;
+      if (!model || !model.settings) return;
+      const s = model.settings;
+      if (s.palette === wanted.palette && s.theme === wanted.theme) return;
+      return win.DEMO.save_settings(Object.assign({}, s, wanted));
+    }).catch(() => {});
+  } catch (e) { /* предпросмотр в песочнице: доступ к iframe закрыт */ }
+}
+function syncFrame(attempt){
+  attempt = attempt || 0;
+  let win = null;
+  try { win = frame && frame.contentWindow; } catch (e) { return; }
+  if (!win) return;
+  if (!win.DEMO || typeof win.DEMO.get_state !== 'function') {
+    if (attempt < 10) setTimeout(() => syncFrame(attempt + 1), 400);
+    return;
+  }
+  pushLook();
+}
+if (frame) {
+  frame.addEventListener('load', () => syncFrame(0));
+  syncFrame(0);
+}
+
+function readPref(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+function savePref(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
+const paletteButtons = [...document.querySelectorAll('.swatch')];
+function applyPalette(id) {
+  document.documentElement.dataset.palette = id;
+  paletteButtons.forEach(b => b.classList.toggle('on', b.dataset.palette === id));
+  savePref('qwdtt-palette', id);
+  syncFrame();
+}
+paletteButtons.forEach(b => b.addEventListener('click', () => applyPalette(b.dataset.palette)));
+
+const themeBtn = document.getElementById('theme-btn');
+function applyTheme(mode) {
+  document.documentElement.dataset.theme = mode;
+  savePref('qwdtt-theme', mode);
+  syncFrame();
+}
+themeBtn.addEventListener('click', () => {
+  applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+});
+
+const savedPalette = readPref('qwdtt-palette');
+if (savedPalette) applyPalette(savedPalette);
+const savedTheme = readPref('qwdtt-theme');
+if (savedTheme) applyTheme(savedTheme);
+else if (matchMedia('(prefers-color-scheme:dark)').matches) applyTheme('dark');
+
+document.querySelectorAll('.copy').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const text = btn.dataset.copy || '';
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (_) {}
+      ta.remove();
+    }
+    const old = btn.textContent;
+    btn.textContent = 'Скопировано';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = old; btn.classList.remove('done'); }, 1400);
+  });
+});
+
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.parentElement.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b === btn));
+    ['t1', 't2', 't3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.hidden = id !== btn.dataset.tab;
+    });
+  });
+});
+
+const EXPECTED = "$SHA256";
+const hashInput = document.getElementById('hash-input');
+const hashResult = document.getElementById('hash-result');
+document.getElementById('hash-check').addEventListener('click', () => {
+  const value = (hashInput.value || '').trim().toLowerCase().replace(/[^0-9a-f]/g, '');
+  if (!value) {
+    hashResult.className = 'checker-result';
+    hashResult.textContent = 'Вставьте хеш из certutil или Get-FileHash.';
+  } else if (value === EXPECTED) {
+    hashResult.className = 'checker-result ok';
+    hashResult.textContent = 'Совпадает — файл целый и это тот самый релиз.';
+  } else {
+    hashResult.className = 'checker-result bad';
+    hashResult.textContent = value.length < 64
+      ? 'Хеш короче 64 символов — скопируйте строку целиком.'
+      : 'Не совпадает с релизным: файл скачался с ошибкой или это другая сборка.';
+  }
+});
+
+const sections = [...document.querySelectorAll('main section[id]')];
+const navLinks = [...document.querySelectorAll('.nav a')];
+const navIo = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    const atTop = window.scrollY < 120;
+    navLinks.forEach(a => a.classList.toggle('on', !atTop && a.getAttribute('href') === '#' + en.target.id));
+  });
+}, { rootMargin: '-30% 0px -65% 0px' });
+window.addEventListener('scroll', () => {
+  if (window.scrollY < 120) navLinks.forEach(a => a.classList.remove('on'));
+}, { passive: true });
+sections.forEach(s => navIo.observe(s));
+
+const revealIo = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('in'); revealIo.unobserve(en.target); }
+  });
+}, { rootMargin: '0px 0px -6% 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealIo.observe(el));
+setTimeout(() => document.querySelectorAll('.reveal:not(.in)').forEach(el => {
+  if (el.getBoundingClientRect().top < innerHeight) el.classList.add('in');
+}), 700);
+
+document.getElementById('year').textContent = new Date().getFullYear();
+document.getElementById('repo-btn').href = 'https://github.com/justac0d1x/' + 'PyWDTT';
+</script>
+</body>
+</html>
