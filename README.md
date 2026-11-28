@@ -12,8 +12,9 @@
 ![license](https://img.shields.io/badge/лицензия-GPL--3.0-6D4D42)
 ![builds](https://img.shields.io/badge/сборки-pyWDTT.pyw%20·%20universal-2FCB95)
 ![size](https://img.shields.io/badge/13.5%20МБ%20%7C%200.75%20МБ-4B4A52)
+[![сайт](https://img.shields.io/badge/сайт-открыть-2FCB95)](https://justac0d1x.github.io/PyWDTT/)
 
-[Скачать](#две-сборки) · [Возможности](#возможности) · [CLI](#командная-строка) · [Как устроено](#как-это-устроено) · [Лицензия](#лицензия)
+[Сайт](https://justac0d1x.github.io/PyWDTT/) · [Скачать](#две-сборки) · [Возможности](#возможности) · [CLI](#командная-строка) · [Как устроено](#как-это-устроено) · [Лицензия](#лицензия)
 
 </div>
 
@@ -180,6 +181,8 @@ python3 site_src/build_site.py   # собирает сайт и кладёт р�
 
 ## Сайт
 
+**[Открыть сайт →](https://justac0d1x.github.io/PyWDTT/)** · [демо интерфейса](https://justac0d1x.github.io/PyWDTT/demo.html)
+
 Лендинг для GitHub Pages собирается из `site_src/` одной командой (`python3 site_src/build_site.py`) и публикуется workflow-ом `.github/workflows/pages.yml`: описание, **живой интерфейс прямо на странице** (тот же HTML, что в окне приложения, — кликается, подключается, переключает темы), установка, скачивание и проверка контрольной суммы. Чтобы включить публикацию, достаточно один раз выбрать **Settings → Pages → Source: GitHub Actions** — дальше сайт пересобирается на каждый пуш.
 
 ## Структура репозитория
@@ -231,6 +234,6 @@ pyWDTT — самостоятельное развитие [qWDTT для Android
 
 <div align="center">
 
-[Группа qWDTT в Telegram](https://t.me/darkbit_chat) · [qWDTT для Android](https://github.com/SpaceNeuroX/proxy-turn-vk-android)
+[Канал в Telegram](https://t.me/c0d1xdev_news) · [qWDTT для Android](https://github.com/SpaceNeuroX/proxy-turn-vk-android)
 
 </div>
