@@ -511,7 +511,7 @@ pythonw pyWDTT.pyw    :: без консольного окна</pre>
     </div>
     <p class="file-note reveal">pyWDTT.pyw — всё внутри, но только Windows. pyWDTT-universal.py — тот же клиент без встроенных библиотек: берёт системный <code>cryptography</code> или считает на чистом Python, поэтому идёт и на Linux с macOS.</p>
     <div class="checker reveal">
-      <input class="input" id="hash-input" placeholder="Вставьте SHA-256 скачанного файла" autocomplete="off" spellcheck="false" aria-label="SHA-256 файла">
+      <input class="input" id="hash-input" placeholder="Вставьте SHA-256 — с префиксом sha256: или без" autocomplete="off" spellcheck="false" aria-label="SHA-256 файла">
       <button class="btn" id="hash-check">Проверить</button>
       <div class="checker-result" id="hash-result" role="status" aria-live="polite" style="flex-basis:100%"></div>
     </div>
@@ -666,11 +666,24 @@ const EXPECTED_FULL = "$SHA256";
 const EXPECTED_LITE = "$LITE_SHA256";
 const hashInput = document.getElementById('hash-input');
 const hashResult = document.getElementById('hash-result');
-document.getElementById('hash-check').addEventListener('click', () => {
-  const value = (hashInput.value || '').trim().toLowerCase().replace(/[^0-9a-f]/g, '');
-  if (!value) {
+/* из вставленного текста вытаскиваем сам хеш: префиксы вида «sha256:», пробелы,
+   переводы строк и имя файла не должны мешать сверке */
+function extractHash(raw) {
+  const text = (raw || '').toLowerCase();
+  const full = text.match(/[0-9a-f]{64}/);
+  if (full) return full[0];
+  const runs = text.match(/[0-9a-f]+/g) || [];
+  return runs.reduce((a, b) => (b.length > a.length ? b : a), '');
+}
+
+function checkHash() {
+  const value = extractHash(hashInput.value);
+  if (value.length < 8) {
     hashResult.className = 'checker-result';
     hashResult.textContent = 'Вставьте хеш из certutil или Get-FileHash.';
+  } else if (value.length < 64) {
+    hashResult.className = 'checker-result bad';
+    hashResult.textContent = 'Хеш короче 64 символов — скопируйте строку целиком.';
   } else if (value === EXPECTED_FULL || value === EXPECTED_LITE) {
     hashResult.className = 'checker-result ok';
     hashResult.textContent = value === EXPECTED_FULL
@@ -678,25 +691,33 @@ document.getElementById('hash-check').addEventListener('click', () => {
       : 'Совпадает — это pyWDTT-universal.py, файл целый и не подменён.';
   } else {
     hashResult.className = 'checker-result bad';
-    hashResult.textContent = value.length < 64
-      ? 'Хеш короче 64 символов — скопируйте строку целиком.'
-      : 'Не совпадает с релизным: файл скачался с ошибкой или это другая сборка.';
+    hashResult.textContent = 'Не совпадает с релизным: файл скачался с ошибкой или это другая сборка.';
   }
-});
+}
+
+document.getElementById('hash-check').addEventListener('click', checkHash);
+hashInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkHash(); });
 
 const sections = [...document.querySelectorAll('main section[id]')];
 const navLinks = [...document.querySelectorAll('.nav a')];
-const navIo = new IntersectionObserver(entries => {
-  entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    const atTop = window.scrollY < 120;
-    navLinks.forEach(a => a.classList.toggle('on', !atTop && a.getAttribute('href') === '#' + en.target.id));
+
+/* активный пункт меню: последняя секция, чей верх выше контрольной линии,
+   а в самом низу страницы — всегда последняя (иначе короткий блок «Вопросы»
+   не попадает в полосу IntersectionObserver и подсветка застревает на «Файлах») */
+function updateNav() {
+  if (window.scrollY < 120) { navLinks.forEach(a => a.classList.remove('on')); return; }
+  const line = window.scrollY + window.innerHeight * 0.35;
+  let active = sections[0];
+  sections.forEach(sec => {
+    if (sec.getBoundingClientRect().top + window.scrollY <= line) active = sec;
   });
-}, { rootMargin: '-30% 0px -65% 0px' });
-window.addEventListener('scroll', () => {
-  if (window.scrollY < 120) navLinks.forEach(a => a.classList.remove('on'));
-}, { passive: true });
-sections.forEach(s => navIo.observe(s));
+  const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+  if (atBottom) active = sections[sections.length - 1];
+  navLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + active.id));
+}
+window.addEventListener('scroll', updateNav, { passive: true });
+window.addEventListener('resize', updateNav);
+updateNav();
 
 const revealIo = new IntersectionObserver(entries => {
   entries.forEach(en => {
@@ -711,5 +732,5 @@ setTimeout(() => document.querySelectorAll('.reveal:not(.in)').forEach(el => {
 document.getElementById('year').textContent = new Date().getFullYear();
 document.getElementById('repo-btn').href = 'https://github.com/justac0d1x/' + 'PyWDTT';
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a619224eab3366a0',t:'MTc5NTg2NjQwNg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a619224eab3366a0',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
